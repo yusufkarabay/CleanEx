@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CleanEx.Repositories
+namespace CleanEx.Repositories.Product
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
