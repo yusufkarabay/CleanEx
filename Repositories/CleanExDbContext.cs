@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CleanEx.Repositories.Products;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanEx.Repositories
 {

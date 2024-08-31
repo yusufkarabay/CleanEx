@@ -1,4 +1,4 @@
-﻿namespace CleanEx.Repositories.Product
+﻿namespace CleanEx.Repositories.Products
 {
     public class Product
     {
