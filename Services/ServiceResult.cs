@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CleanEx.Services
 {
+    public record NoContentDto;
     public class ServiceResult<T> where T : class
     {
         public T Data { get; private set; }
@@ -17,17 +18,17 @@ namespace CleanEx.Services
 
         public static ServiceResult<T> Success(T data, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful=true };
+            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful = true };
         }
 
-        public static ServiceResult<T> Success(T data, HttpStatusCode statusCode = HttpStatusCode.OK, string message)
+        public static ServiceResult<T> Success(T data, string message, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful=true, Message=message };
+            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful = true, Message = message };
         }
 
-        public static ServiceResult<T> Success(T data, HttpStatusCode statusCode = HttpStatusCode.OK, string message, int count)
+        public static ServiceResult<T> Success(T data, string message, int count, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful=true, Message=message, Count=count };
+            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful = true, Message = message, Count = count };
         }
 
         public static ServiceResult<T> Success(HttpStatusCode statusCode = HttpStatusCode.OK)
@@ -37,21 +38,24 @@ namespace CleanEx.Services
 
         public static ServiceResult<T> Fail(ErrorDto errorDto, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         {
-            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful=false };
+            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful = false };
         }
 
-        public static ServiceResult<T> Fail(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest, bool isShow)
+        public static ServiceResult<T> Fail(string errorMessage, bool isShow, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         {
             var errorDto = new ErrorDto(errorMessage, isShow);
-            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful=false };
+            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful = false };
         }
 
-        public static ServiceResult<T> FailMessage(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest, bool isShow)
+        public static ServiceResult<T> FailMessage(string errorMessage, bool isShow, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         {
             var errorDto = new ErrorDto(errorMessage, isShow);
-            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful=false, Message=errorMessage };
+            return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful = false, Message = errorMessage };
         }
     }
 
 }
-}
+
+
+
+
