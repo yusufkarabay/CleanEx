@@ -12,6 +12,8 @@ namespace CleanEx.Services
         public ErrorDto Error { get; private set; }
         public string Message { get; private set; }
         public int Count { get; private set; }
+        [JsonIgnore]
+        public string? UrlAsCreated { get; private set; }
 
         [JsonIgnore]
         public bool IsSuccessful { get; private set; }
@@ -23,7 +25,11 @@ namespace CleanEx.Services
 
         public static ServiceResult<T> Success(T data, string message, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            return new ServiceResult<T> { Data = data, StatusCode = statusCode, IsSuccessful = true, Message = message };
+            return new ServiceResult<T> { Data = data, Message = message, StatusCode = statusCode, IsSuccessful = true };
+        }
+        public static ServiceResult<T> SuccessAsCreated(T data, string urlAsCreated, HttpStatusCode statusCode = HttpStatusCode.Created)
+        {
+            return new ServiceResult<T> { Data = data, StatusCode = statusCode, UrlAsCreated=urlAsCreated, IsSuccessful = true };
         }
 
         public static ServiceResult<T> Success(T data, string message, int count, HttpStatusCode statusCode = HttpStatusCode.OK)
@@ -51,6 +57,10 @@ namespace CleanEx.Services
         {
             var errorDto = new ErrorDto(errorMessage, isShow);
             return new ServiceResult<T> { Error = errorDto, StatusCode = statusCode, IsSuccessful = false, Message = errorMessage };
+        }
+        public static ServiceResult<T> NoContent(HttpStatusCode statusCode = HttpStatusCode.NoContent)
+        {
+            return new ServiceResult<T> { StatusCode = statusCode, IsSuccessful = true };
         }
     }
 

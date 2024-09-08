@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanEx.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CustomBaseController : ControllerBase
     {
@@ -12,7 +12,11 @@ namespace CleanEx.API.Controllers
         {
             if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
-                return new ObjectResult(result) { StatusCode = (int)result.StatusCode };
+                return NoContent();
+            }
+            if (result.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+                return Created(result.UrlAsCreated, result);
             }
             return new ObjectResult(result.Data) { StatusCode = (int)result.StatusCode };
         }
