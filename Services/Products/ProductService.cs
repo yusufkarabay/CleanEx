@@ -7,11 +7,13 @@ namespace CleanEx.Services.Products
     public interface IProductService
     {
         public Task<ServiceResult<List<ProductDto>>> GetTopPriceProductAsyn(int count);
-        public Task<ServiceResult<CreateProductRequest>> CreateProductAsyn(CreateProductRequest request);
+        public Task<ServiceResult<CreateProductResponse>> CreateProductAsyn(CreateProductRequest request);
         public Task<ServiceResult<NoContentDto>> UpdateProductAsyn(Guid id, UpdateProductRequest request);
+        public Task<ServiceResult<NoContentDto>> UpdateStockAsyn(UpdateProductStockRequest updateProductStockRequest);
         public Task<ServiceResult<NoContentDto>> DeleteProductAsyn(Guid id);
         public Task<ServiceResult<List<ProductDto>>> GetAllAsync();
         public Task<ServiceResult<ProductDto>> GetProductByIdAsync(Guid id);
+        public Task<ServiceResult<List<ProductDto>>> GetPagedAllAsync(int page, int size);
     }
     public class ProductService : IProductService
     {
@@ -45,7 +47,7 @@ namespace CleanEx.Services.Products
             return ServiceResult<ProductDto>.Success(productDto);
         }
 
-        public async Task<ServiceResult<CreateProductRequest>> CreateProductAsyn(CreateProductRequest request)
+        public async Task<ServiceResult<CreateProductResponse>> CreateProductAsyn(CreateProductRequest request)
         {
             var product = new Product
             {
@@ -56,7 +58,7 @@ namespace CleanEx.Services.Products
             };
             await _productRepository.AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
-            return ServiceResult<CreateProductRequest>.Success(request);
+            return ServiceResult<CreateProductResponse>.SuccessAsCreated(new CreateProductResponse(product.Id), $"api/prodcuts/{product.Id}");
         }
 
         public async Task<ServiceResult<NoContentDto>> UpdateProductAsyn(Guid id, UpdateProductRequest request)
@@ -96,6 +98,30 @@ namespace CleanEx.Services.Products
             }
             var productDtos = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Description, p.Stock)).ToList();
             return ServiceResult<List<ProductDto>>.Success(productDtos);
+        }
+
+        public async Task<ServiceResult<List<ProductDto>>> GetPagedAllAsync(int page, int size)
+        {
+            var products = _productRepository.GetAllAsync(false).Result.Skip((page - 1) * size).Take(size).ToList();
+            if (products.Count == 0)
+            {
+                return ServiceResult<List<ProductDto>>.FailMessage("Products not found", true, HttpStatusCode.NotFound);
+            }
+            var productDtos = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Description, p.Stock)).ToList();
+            return ServiceResult<List<ProductDto>>.Success(productDtos);
+        }
+
+        public async Task<ServiceResult<NoContentDto>> UpdateStockAsyn(UpdateProductStockRequest updateProductStockRequest)
+        {
+            var product = _productRepository.GetByIdAsync(updateProductStockRequest.Id).Result;
+            if (product is null)
+            {
+                return ServiceResult<NoContentDto>.FailMessage("Product not found", true, HttpStatusCode.NotFound);
+            }
+            product.Stock = updateProductStockRequest.Quantity;
+            await _productRepository.UpdateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
+            return ServiceResult<NoContentDto>.Success();
         }
     }
 
