@@ -63,7 +63,6 @@ namespace CleanEx.Services
             return new ServiceResult<T> { StatusCode = statusCode, IsSuccessful = true };
         }
     }
-
 }
 
 

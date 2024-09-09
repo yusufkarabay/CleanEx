@@ -1,4 +1,6 @@
-﻿using CleanEx.Repositories.Products;
+﻿using CleanEx.Repositories.Categories;
+using CleanEx.Repositories.Interceptors;
+using CleanEx.Repositories.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +19,10 @@ namespace CleanEx.Repositories.Extensions
                 {
                     sqlServerOptionsAction.MigrationsAssembly(typeof(RepositoryAssembly).Assembly.FullName);
                 });
+                options.AddInterceptors(new AuditDbContextInterceptors());
             });
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

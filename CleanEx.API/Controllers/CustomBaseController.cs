@@ -1,5 +1,6 @@
 ﻿using CleanEx.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CleanEx.API.Controllers
 {
@@ -10,16 +11,22 @@ namespace CleanEx.API.Controllers
         [NonAction]
         public async Task<IActionResult> CreateActionResult<T>(ServiceResult<T> result) where T : class
         {
-            if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
+            if (result.StatusCode == HttpStatusCode.NoContent)
             {
                 return NoContent();
             }
-            if (result.StatusCode == System.Net.HttpStatusCode.Created)
+            if (result.StatusCode == HttpStatusCode.Created)
             {
                 return Created(result.UrlAsCreated, result);
             }
+            if (!result.IsSuccessful)
+            {
+                return new ObjectResult(result.Error) { StatusCode = (int)result.StatusCode };
+            }
+
             return new ObjectResult(result.Data) { StatusCode = (int)result.StatusCode };
         }
+
         [NonAction]
         public async Task<IActionResult> CreateActionResult(ServiceResult<NoContentDto> result)
         {

@@ -1,4 +1,7 @@
 ﻿using CleanEx.Services.Products;
+using CleanEx.Services.Products.Create;
+using CleanEx.Services.Products.Update;
+using CleanEx.Services.Products.UpdateStock;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanEx.API.Controllers
@@ -17,7 +20,8 @@ namespace CleanEx.API.Controllers
         [HttpPost]
         [Route("CreateProduct")]
         public async Task<IActionResult> CreateProduct(CreateProductRequest request) =>
-            await CreateActionResult(await productService.CreateProductAsyn(request));
+             await CreateActionResult(await productService.CreateProductAsyn(request));
+
         [HttpPut]
         public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductRequest request) =>
             await CreateActionResult(await productService.UpdateProductAsyn(id, request));

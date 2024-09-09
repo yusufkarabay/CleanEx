@@ -1,5 +1,9 @@
-﻿using CleanEx.Repositories;
+﻿using AutoMapper;
+using CleanEx.Repositories;
 using CleanEx.Repositories.Products;
+using CleanEx.Services.Products.Create;
+using CleanEx.Services.Products.Update;
+using CleanEx.Services.Products.UpdateStock;
 using System.Net;
 
 namespace CleanEx.Services.Products
@@ -19,10 +23,12 @@ namespace CleanEx.Services.Products
     {
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
+            _mapper=mapper;
         }
 
         public async Task<ServiceResult<List<ProductDto>>> GetTopPriceProductAsyn(int count)
@@ -32,7 +38,7 @@ namespace CleanEx.Services.Products
             {
                 return ServiceResult<List<ProductDto>>.FailMessage("Products not found", true, HttpStatusCode.NotFound);
             }
-            var productDtos = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Description, p.Stock)).ToList();
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
             return ServiceResult<List<ProductDto>>.Success(productDtos);
         }
 
@@ -43,19 +49,18 @@ namespace CleanEx.Services.Products
             {
                 return ServiceResult<ProductDto>.FailMessage("Product not found", true, HttpStatusCode.NotFound);
             }
-            var productDto = new ProductDto(product.Id, product.Name, product.Price, product.Description, product.Stock);
+            var productDto = _mapper.Map<ProductDto>(product);
             return ServiceResult<ProductDto>.Success(productDto);
         }
 
         public async Task<ServiceResult<CreateProductResponse>> CreateProductAsyn(CreateProductRequest request)
         {
-            var product = new Product
+            var existingProduct = await _productRepository.FindAsync(x => x.Name== request.Name, false);
+            if (existingProduct != null)
             {
-                Name = request.Name,
-                Price = request.Price,
-                Description = request.Description,
-                Stock = request.Stock
-            };
+                return ServiceResult<CreateProductResponse>.Fail("Product already exists", true, HttpStatusCode.BadRequest);
+            }
+            var product = _mapper.Map<Product>(request);
             await _productRepository.AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
             return ServiceResult<CreateProductResponse>.SuccessAsCreated(new CreateProductResponse(product.Id), $"api/prodcuts/{product.Id}");
@@ -67,6 +72,12 @@ namespace CleanEx.Services.Products
             if (product is null)
             {
                 return ServiceResult<NoContentDto>.FailMessage("Product not found", true, HttpStatusCode.NotFound);
+            }
+
+            var existingProduct = await _productRepository.FindAsync(x => x.Name== request.Name&&x.Id!=request.Id, false);
+            if (existingProduct != null)
+            {
+                return ServiceResult<NoContentDto>.Fail("Product already exists", true, HttpStatusCode.BadRequest);
             }
             product.Name = request.Name;
             product.Price = request.Price;
@@ -96,7 +107,7 @@ namespace CleanEx.Services.Products
             {
                 return ServiceResult<List<ProductDto>>.FailMessage("Products not found", true, HttpStatusCode.NotFound);
             }
-            var productDtos = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Description, p.Stock)).ToList();
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
             return ServiceResult<List<ProductDto>>.Success(productDtos);
         }
 
@@ -107,7 +118,7 @@ namespace CleanEx.Services.Products
             {
                 return ServiceResult<List<ProductDto>>.FailMessage("Products not found", true, HttpStatusCode.NotFound);
             }
-            var productDtos = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Description, p.Stock)).ToList();
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
             return ServiceResult<List<ProductDto>>.Success(productDtos);
         }
 
