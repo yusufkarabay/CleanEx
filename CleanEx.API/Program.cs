@@ -1,8 +1,9 @@
 using CleanEx.Repositories.Extensions;
+using CleanEx.Services;
 using CleanEx.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<FluentValidationFilter>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRepositories(builder.Configuration).AddServices(builder.Configuration);

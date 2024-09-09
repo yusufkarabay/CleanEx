@@ -1,6 +1,6 @@
-﻿using CleanEx.Repositories.Products;
-using Microsoft.EntityFrameworkCore;
-namespace CleanEx.Repositories
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace CleanEx.Repositories.Products
 {
     public interface IProductRepository : IGenericRepository<Product>
     {
