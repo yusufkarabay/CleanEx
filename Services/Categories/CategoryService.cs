@@ -85,7 +85,6 @@ namespace CleanEx.Services.Categories
             return ServiceResult<CategoryWithProductsDto>.Success(mappedCategory);
 
         }
-
         public async Task<ServiceResult<CategoryDto>> Update(Guid id, UpdateCategoryRequest request)
         {
             var category = await _categoryRepository.FindAsync(x => x.Id == id, true);
@@ -94,18 +93,20 @@ namespace CleanEx.Services.Categories
                 return ServiceResult<CategoryDto>.Fail("Category not found", true);
             }
 
-            var isCategoryNameExist = await _categoryRepository.FindAsync(x => x.Name == request.Name && x.Id != id, false);
+            var isCategoryNameExist = await _categoryRepository.FindAsync(x => x.Name == request.Name && x.Id != id, true);
             if (isCategoryNameExist != null)
             {
                 return ServiceResult<CategoryDto>.Fail("Category already exists", true);
             }
 
-            _mapper.Map(request, category);
+            var mappedCategory = _mapper.Map(request, category);
 
+            await _categoryRepository.UpdateAsync(mappedCategory);
             await _unitOfWork.SaveChangesAsync();
 
             return ServiceResult<CategoryDto>.Success(new CategoryDto(category.Id, category.Name, category.Description, new List<CategoryWithProductsDto>()));
         }
+
 
     }
 }

@@ -28,6 +28,7 @@ namespace CleanEx.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryRequest request) =>
             await CreateActionResult(await _categoryService.Update(id, request));
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(Guid id) =>
             await CreateActionResult(await _categoryService.Delete(id));

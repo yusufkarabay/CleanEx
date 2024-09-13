@@ -29,6 +29,7 @@ namespace CleanEx.API.Controllers
         [Route("DeleteProduct")]
         public async Task<IActionResult> DeleteProduct(Guid id) =>
             await CreateActionResult(await productService.DeleteProductAsyn(id));
+
         [HttpGet("{page:int}/{size:int}")]
         public async Task<IActionResult> GetPagedProducts(int page, int size) =>
             await CreateActionResult(await productService.GetPagedAllAsync(page, size));

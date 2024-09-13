@@ -22,5 +22,9 @@ namespace CleanEx.Repositories
         public bool IsDeleted { get; set; } = false;
         public string CreatedBy { get; set; } = "Yusuf";
         public string? LastModifiedBy { get; set; }
+        [ConcurrencyCheck]
+        public long Version { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

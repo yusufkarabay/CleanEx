@@ -13,6 +13,7 @@ namespace CleanEx.Repositories
         Task<T> FindAsync(Expression<Func<T, bool>> conditions, bool trackChanges);
         Task<bool> ExistsAsync(Guid id);
         Task AddRangeAsync(IEnumerable<T> entities);
+        Task<T> GetByIdAsync(Guid id);
     }
     public abstract class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -46,6 +47,11 @@ namespace CleanEx.Repositories
         public async Task<IEnumerable<T>> GetAllAsync(bool trackChanges)
         {
             return !trackChanges ? await _context.Set<T>().AsNoTracking().ToListAsync() : await _context.Set<T>().ToListAsync();
+        }
+
+        public async Task<T> GetByIdAsync(Guid id)
+        {
+            return await _context.Set<T>().FindAsync(id);
         }
 
         public async Task<IQueryable<T>> SearchAsync(Expression<Func<T, bool>> conditions, bool trackChanges)
